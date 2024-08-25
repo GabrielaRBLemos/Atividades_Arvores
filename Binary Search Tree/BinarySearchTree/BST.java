@@ -58,19 +58,22 @@ public class BST{
 
     private BSTNode search(int value){
         BSTNode currentNode = this.root;
-        while (true) {
-            if(currentNode.getValue() > value){
-                currentNode = currentNode.getLeft();
+        if (isEmpty()) {
+            return null;
+        }
+        else{
+            while (currentNode!=null) {
+                if(currentNode.getValue() > value){
+                    currentNode = currentNode.getLeft();
+                }
+                else if(currentNode.getValue() < value){
+                    currentNode = currentNode.getRight();
+                }
+                else if(currentNode.getValue() == value){
+                    return currentNode;
+                }
             }
-            else if(currentNode.getValue() < value){
-                currentNode = currentNode.getRight();
-            }
-            else if(currentNode.getValue() == value){
-                return currentNode;
-            }
-            else{
-                return null;
-            }
+            return null;
         }
     }
 
