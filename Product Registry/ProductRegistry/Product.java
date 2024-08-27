@@ -1,10 +1,10 @@
 package ProductRegistry;
-public class Product {
+public class Product implements Comparable<Product>{
     private String code, description, supplier;
     private double price;
     private int qntInStock;
     
-    public Product(String code, String description, String supplier, double price, int qntInStock) {
+    public Product(String code, String description, String supplier, Double price, Integer qntInStock) {
         this.code = code;
         this.description = description;
         this.supplier = supplier;
@@ -45,6 +45,12 @@ public class Product {
     public String toString() {
         return "Código:" + code + ", Descrição:" + description + ", Fornecedor:" + supplier + ", Preço:" + price
                 + ", Quantidade no estoque:" + qntInStock;
+    }
+    @Override
+    public int compareTo(Product productB){
+        String codeA = this.code, codeB = productB.getCode();
+
+        return codeA.compareTo(codeB);
     }
 
 }
