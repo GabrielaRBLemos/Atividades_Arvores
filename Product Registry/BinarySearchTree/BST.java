@@ -1,17 +1,16 @@
 package BinarySearchTree;
 
-import ProductRegistry.Product;
 import Queue.Queue;
 import Stack.Stack;
 
-public class BST{
-    private BSTNode root;
+public class BST<T extends Comparable<T>>{
+    private BSTNode<T> root;
 
-    public BSTNode getRoot() {
+    public BSTNode<T> getRoot() {
         return root;
     }
 
-    public void setRoot(BSTNode root) {
+    public void setRoot(BSTNode<T> root) {
         this.root = root;
     }
 
@@ -24,16 +23,16 @@ public class BST{
         }
     }
 
-    public void insert(Product value){
-        BSTNode newNode;
-        newNode = new BSTNode(value);
+    public void insert(T value){
+        BSTNode<T> newNode;
+        newNode = new BSTNode<T>(value);
         if (this.isEmpty() == true) {
             this.root = newNode;
         }
         else{
-            BSTNode currentNode = this.root;
+            BSTNode<T> currentNode = this.root;
             while (true) {
-                if (currentNode.getValue().getCode().compareTo(newNode.getValue().getCode())>0){
+                if (currentNode.getValue().compareTo(newNode.getValue())>0){
                     if (currentNode.getLeft() == null){
                         currentNode.setLeft(newNode);
                         System.err.println("Inserção Efetuada");
@@ -57,20 +56,20 @@ public class BST{
         }
     }
 
-    public BSTNode search(String valuesCode){
-        BSTNode currentNode = this.root;
+    private BSTNode<T> search(T searchValue){
+        BSTNode<T> currentNode = this.root;
         if (this.isEmpty()) {
             return null;
         }
         else{
             while (currentNode != null) {
-                if(currentNode.getValue().getCode().compareTo(valuesCode)>0){
+                if(currentNode.getValue().compareTo(searchValue)>0){
                     currentNode = currentNode.getLeft();
                 }
-                else if(currentNode.getValue().getCode().compareTo(valuesCode)<0){
+                else if(currentNode.getValue().compareTo(searchValue)<0){
                     currentNode = currentNode.getRight();
                 }
-                else if(currentNode.getValue().getCode().compareTo(valuesCode)<0){
+                else if(currentNode.getValue().compareTo(searchValue)<0){
                     return currentNode;
                 }
             }
@@ -78,33 +77,13 @@ public class BST{
         }
     }
 
-    public void printNodeValue(String valuesCode){
-        BSTNode result = search(valuesCode);
+    public T lookup(T searchValue){
+        BSTNode<T>result = this.search(searchValue);
         if (result == null) {
-            System.out.println("Código Não Encontrado");
+            return null;
         }
         else{
-            System.out.println(result.toString());
-        }
-    }
-
-    public void alterValuePrice(String valuesCode, double newPrice){
-        BSTNode result = search(valuesCode);
-        if (result == null) {
-            System.out.println("Código Não Encontrado");
-        }
-        else{
-            result.getValue().setPrice(newPrice);
-        }
-    }
-
-    public void alterValueQntInStock(String valuesCode, int newQntInStock){
-        BSTNode result = search(valuesCode);
-        if (result == null) {
-            System.out.println("Código Não Encontrado");
-        }
-        else{
-            result.getValue().setQntInStock(newQntInStock);
+            return result.getValue();
         }
     }
 
@@ -113,8 +92,8 @@ public class BST{
             System.out.println("O registro está vazio.");
         }
         else{
-            Stack<BSTNode> waitingStack = new Stack<BSTNode>();
-            BSTNode currentNode = this.root;
+            Stack<BSTNode<T>> waitingStack = new Stack<BSTNode<T>>();
+            BSTNode<T> currentNode = this.root;
 
             waitingStack.push(currentNode);
             
@@ -130,8 +109,8 @@ public class BST{
         }
     }
 
-    public void contain(String valuesCode){
-        if (this.search(valuesCode)==null) {
+    public void contain(T searchValue){
+        if (this.search(searchValue)==null) {
             System.err.println("Produto cadastrado");
         }
         else{
@@ -144,8 +123,8 @@ public class BST{
             return 0;
         }
         else{
-            BSTNode currentNode = this.root;
-            Queue<BSTNode> waitingQueue = new Queue<BSTNode>();
+            BSTNode<T> currentNode = this.root;
+            Queue<BSTNode<T>> waitingQueue = new Queue<BSTNode<T>>();
 
             int numOfNodes = 0;
 

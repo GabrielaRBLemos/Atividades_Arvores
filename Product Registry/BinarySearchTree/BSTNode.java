@@ -1,37 +1,35 @@
 package BinarySearchTree;
 
-import ProductRegistry.Product;
+class BSTNode<T extends Comparable<T>>{
+    private BSTNode<T> left;
+    private T Value;
+    private BSTNode<T> right;
 
-class BSTNode{
-    private BSTNode left;
-    private Product Value;
-    private BSTNode right;
-
-    public BSTNode(Product value) {
+    public BSTNode(T value) {
         Value = value;
     }
 
-    public Product getValue() {
+    public T getValue() {
         return Value;
     }
     
-    public void setValue(Product value) {
+    public void setValue(T value) {
         Value = value;
     }
 
-    public BSTNode getLeft() {
+    public BSTNode<T> getLeft() {
         return left;
     }
 
-    public void setLeft(BSTNode left) {
+    public void setLeft(BSTNode<T> left) {
         this.left = left;
     }
 
-    public BSTNode getRight() {
+    public BSTNode<T> getRight() {
         return right;
     }
 
-    public void setRight(BSTNode right) {
+    public void setRight(BSTNode<T> right) {
         this.right = right;
     }
     
