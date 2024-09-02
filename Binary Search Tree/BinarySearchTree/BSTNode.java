@@ -1,35 +1,35 @@
 package BinarySearchTree;
 
-class BSTNode{
-    private BSTNode left;
-    private int Value;
-    private BSTNode right;
+class BSTNode<T extends Comparable<T>>{
+    private BSTNode<T> left;
+    private T Value;
+    private BSTNode<T> right;
 
-    public BSTNode(int value) {
+    public BSTNode(T value) {
         Value = value;
     }
 
-    public int getValue() {
+    public T getValue() {
         return Value;
     }
     
-    public void setValue(int value) {
+    public void setValue(T value) {
         Value = value;
     }
 
-    public BSTNode getLeft() {
+    public BSTNode<T> getLeft() {
         return left;
     }
 
-    public void setLeft(BSTNode left) {
+    public void setLeft(BSTNode<T> left) {
         this.left = left;
     }
 
-    public BSTNode getRight() {
+    public BSTNode<T> getRight() {
         return right;
     }
 
-    public void setRight(BSTNode right) {
+    public void setRight(BSTNode<T> right) {
         this.right = right;
     }
     
