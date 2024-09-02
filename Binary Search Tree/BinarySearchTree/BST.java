@@ -3,14 +3,14 @@ package BinarySearchTree;
 import Queue.Queue;
 import Stack.Stack;
 
-public class BST{
-    private BSTNode root;
+public class BST<T extends Comparable<T>>{
+    private BSTNode<T> root;
 
-    public BSTNode getRoot() {
+    public BSTNode<T> getRoot() {
         return root;
     }
 
-    public void setRoot(BSTNode root) {
+    public void setRoot(BSTNode<T> root) {
         this.root = root;
     }
 
@@ -23,16 +23,16 @@ public class BST{
         }
     }
 
-    public void insert(int value){
-        BSTNode newNode;
-        newNode = new BSTNode(value);
+    public void insert(T value){
+        BSTNode<T> newNode;
+        newNode = new BSTNode<T>(value);
         if (this.isEmpty() == true) {
             this.root = newNode;
         }
         else{
-            BSTNode currentNode = this.root;
+            BSTNode<T> currentNode = this.root;
             while (true) {
-                if (currentNode.getValue() > newNode.getValue()){
+                if (currentNode.getValue().compareTo(value)>0){
                     if (currentNode.getLeft() == null){
                         currentNode.setLeft(newNode);
                         System.err.println("Inserção Efetuada");
@@ -56,20 +56,95 @@ public class BST{
         }
     }
 
-    private BSTNode search(int value){
-        BSTNode currentNode = this.root;
-        if (isEmpty()) {
+    public void removeRecursive(T value){
+        if (this.isEmpty()==true) {
+            System.out.println("Árvore está vazia");
+        }
+        else{
+            this.root = this.removeNodeRecursive(this.root,value);
+            int result = value.compareTo(root.getValue());
+            if (result == 0) {
+                if(root.getLeft()==null && root.getRight()==null){
+                    root = null;
+                }
+                else if (root.getLeft()==null) {
+                    root=root.getRight();
+                }
+                else if (root.getRight()==null) {
+                    root=root.getLeft();
+                }
+                else{
+                    //node with two children
+                    BSTNode<T> parent, child;
+                    parent = root;
+                    child = root.getLeft();
+                    if (child.getRight() != null) {
+                        while (child.getRight() != null) {
+                            parent = child;
+                            child.getRight();
+                        }
+                    }
+                    root.setValue(child.getValue());
+                    parent.setRight(child.getLeft());
+                    
+                }
+            }
+        }
+    }
+
+    private BSTNode<T> removeNodeRecursive(BSTNode<T> root,T value){
+        if (root != null) {
+            int result = value.compareTo(root.getValue());
+            if (result == 0) {
+                if(root.getLeft()==null && root.getRight()==null){
+                    root = null;
+                }
+                else if (root.getLeft()==null) {
+                    root=root.getRight();
+                }
+                else if (root.getRight()==null) {
+                    root=root.getLeft();
+                }
+                else{
+                    //node with two children
+                    BSTNode<T> parent, child;
+                    parent = root;
+                    child = root.getLeft();
+                    if (child.getRight() != null) {
+                        while (child.getRight() != null) {
+                            parent = child;
+                            child.getRight();
+                        }
+                    }
+                    root.setValue(child.getValue());
+                    parent.setRight(child.getLeft());
+                    
+                }
+            }
+            else if (result < 0){
+                root.setLeft(this.removeNodeRecursive(root.getLeft(), value));
+            }
+            else{
+                root.setRight(this.removeNodeRecursive(root.getRight(), value));
+            }
+        }
+        return root;
+    }
+
+    private BSTNode<T> search(T searchValue){
+        BSTNode<T> currentNode = this.root;
+        if (this.isEmpty()) {
             return null;
         }
         else{
-            while (currentNode!=null) {
-                if(currentNode.getValue() > value){
+            while (currentNode != null) {
+                if(currentNode.getValue().compareTo(searchValue)>0){
                     currentNode = currentNode.getLeft();
                 }
-                else if(currentNode.getValue() < value){
+                else if(currentNode.getValue().compareTo(searchValue)<0){
                     currentNode = currentNode.getRight();
                 }
-                else if(currentNode.getValue() == value){
+                else if(currentNode.getValue().compareTo(searchValue)<0){
                     return currentNode;
                 }
             }
@@ -77,7 +152,17 @@ public class BST{
         }
     }
 
-    public void contain(int value){
+    public T lookup(T searchValue){
+        BSTNode<T> result = this.search(searchValue);
+        if (result == null) {
+            return null;
+        }
+        else{
+            return result.getValue();
+        }
+    }
+
+    public void contain(T value){
         if (this.search(value)==null) {
             System.err.println("Valor Não Encontrado na Árvore");
         }
@@ -86,15 +171,15 @@ public class BST{
         }
     }
 
-    public void insertTwoAux(int value){
+    public void insertTwoAux(T value){
         if (this.isEmpty() == true) {
             this.root.setValue(value);
         }
         else{
-            BSTNode currentNode = this.root;
-            BSTNode parentNode = null;
+            BSTNode<T> currentNode = this.root;
+            BSTNode<T> parentNode = null;
             while (true) {
-                if (currentNode.getValue() > value){
+                if (currentNode.getValue().compareTo(value)>0){
                     parentNode = currentNode;
                     currentNode = currentNode.getLeft();
                     if (currentNode.getLeft() == null){
@@ -116,16 +201,16 @@ public class BST{
         }
     }
 
-    private BSTNode leftestNode(){
-        BSTNode currentNode = this.root;
+    private BSTNode<T> leftestNode(){
+        BSTNode<T> currentNode = this.root;
         while(currentNode.getLeft() != null){
             currentNode = currentNode.getLeft();
         }
         return currentNode;
     }
 
-    private BSTNode rightestNode(){
-            BSTNode currentNode = this.root;
+    private BSTNode<T> rightestNode(){
+            BSTNode<T> currentNode = this.root;
             while(currentNode.getRight() != null){
                 currentNode = currentNode.getRight();
             }
@@ -133,12 +218,12 @@ public class BST{
     }
 
     public void min(){
-        int min = leftestNode().getValue();
+        T min = leftestNode().getValue();
         System.out.println(String.format("O Menor Valor Na Árvore: %d", min));
     }
 
     public void max(){
-        int max = rightestNode().getValue();
+        T max = rightestNode().getValue();
         System.out.println(String.format("O Maior Valor Na Árvore: %d", max));
     }
 
@@ -147,8 +232,8 @@ public class BST{
             System.out.println("A árvore está vazia.");
         }
         else{
-            BSTNode currentNode = this.root;
-            Queue<BSTNode> waitingQueue = new Queue<BSTNode>();
+            BSTNode<T> currentNode = this.root;
+            Queue<BSTNode<T>> waitingQueue = new Queue<BSTNode<T>>();
 
             waitingQueue.enqueue(currentNode);
             while (!waitingQueue.isEmpty()) {
@@ -171,8 +256,8 @@ public class BST{
             System.out.println("A árvore está vazia.");
         }
         else{
-            Stack<BSTNode> waitingStack = new Stack<BSTNode>();
-            BSTNode currentNode = this.root;
+            Stack<BSTNode<T>> waitingStack = new Stack<BSTNode<T>>();
+            BSTNode<T> currentNode = this.root;
 
             waitingStack.push(currentNode);
             
@@ -194,8 +279,8 @@ public class BST{
             System.out.println("A árvore está vazia.");
         }
         else{
-            Stack<BSTNode> waitingStack = new Stack<BSTNode>();
-            BSTNode currentNode;
+            Stack<BSTNode<T>> waitingStack = new Stack<BSTNode<T>>();
+            BSTNode<T> currentNode;
 
             waitingStack.push(this.root);
             
@@ -216,7 +301,7 @@ public class BST{
         }
     }
 
-    public int numberOfNodesRecursive(BSTNode root){
+    public int numberOfNodesRecursive(BSTNode<T> root){
         if (this.isEmpty()) {
             return 0;
         }
@@ -233,8 +318,8 @@ public class BST{
             return 0;
         }
         else{
-            BSTNode currentNode = this.root;
-            Queue<BSTNode> waitingQueue = new Queue<BSTNode>();
+            BSTNode<T> currentNode = this.root;
+            Queue<BSTNode<T>> waitingQueue = new Queue<BSTNode<T>>();
 
             int numOfNodes = 0;
 
@@ -254,7 +339,7 @@ public class BST{
         }
     }
 
-    public int numberOfLeafsRecursive(BSTNode root){
+    public int numberOfLeafsRecursive(BSTNode<T> root){
         if (this.isEmpty()) {
             return 0;
         }
@@ -263,10 +348,10 @@ public class BST{
                 return 0;
             }
             else if (root.getLeft() == null && root.getRight() == null){
-                return 1 + numberOfLeafsRecursive(root.getLeft()) + numberOfNodesRecursive(root.getRight());
+                return 1 + numberOfLeafsRecursive(root.getLeft()) + numberOfLeafsRecursive(root.getRight());
             }
             else{
-                return 0 + numberOfLeafsRecursive(root.getLeft()) + numberOfNodesRecursive(root.getRight());
+                return 0 + numberOfLeafsRecursive(root.getLeft()) + numberOfLeafsRecursive(root.getRight());
             }
         }
     }
@@ -276,8 +361,8 @@ public class BST{
             return 0;
         }
         else{
-            BSTNode currentNode = this.root;
-            Queue<BSTNode> waitingQueue = new Queue<BSTNode>();
+            BSTNode<T> currentNode = this.root;
+            Queue<BSTNode<T>> waitingQueue = new Queue<BSTNode<T>>();
 
             int numOfLeafs = 0;
 
@@ -299,7 +384,7 @@ public class BST{
         }
     }
 
-    public int numberOfNonTerminalsRecursive(BSTNode root){
+    public int numberOfNonTerminalsRecursive(BSTNode<T> root){
         if (this.isEmpty()) {
             return 0;
         }
@@ -321,8 +406,8 @@ public class BST{
             return 0;
         }
         else{
-            BSTNode currentNode = this.root;
-            Queue<BSTNode> waitingQueue = new Queue<BSTNode>();
+            BSTNode<T> currentNode = this.root;
+            Queue<BSTNode<T>> waitingQueue = new Queue<BSTNode<T>>();
 
             int numOfLeafs = 0;
 
