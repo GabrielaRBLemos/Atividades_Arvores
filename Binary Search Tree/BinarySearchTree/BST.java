@@ -56,6 +56,84 @@ public class BST<T extends Comparable<T>>{
         }
     }
 
+    public void remove(T value) {
+        if (this.isEmpty()) {
+            System.out.println("Árvore está vazia");
+            return;
+        }
+    
+        BSTNode<T> currentNode = this.root;
+        BSTNode<T> parentNode = null;
+        int result;
+    
+        while (currentNode != null) {
+            result = value.compareTo(currentNode.getValue());
+    
+            if (result == 0) {
+                // Caso 1: O nó a ser removido não tem filhos
+                if (currentNode.getLeft() == null && currentNode.getRight() == null) {
+                    if (parentNode == null) {
+                        this.root = null; // Nó raiz sendo removido
+                    } else if (parentNode.getLeft() == currentNode) {
+                        parentNode.setLeft(null);
+                    } else {
+                        parentNode.setRight(null);
+                    }
+                }
+                // Caso 2: O nó a ser removido tem apenas um filho
+                else if (currentNode.getLeft() == null) {
+                    if (parentNode == null) {
+                        this.root = currentNode.getRight(); // Nó raiz sendo removido
+                    } else if (parentNode.getLeft() == currentNode) {
+                        parentNode.setLeft(currentNode.getRight());
+                    } else {
+                        parentNode.setRight(currentNode.getRight());
+                    }
+                } else if (currentNode.getRight() == null) {
+                    if (parentNode == null) {
+                        this.root = currentNode.getLeft(); // Nó raiz sendo removido
+                    } else if (parentNode.getLeft() == currentNode) {
+                        parentNode.setLeft(currentNode.getLeft());
+                    } else {
+                        parentNode.setRight(currentNode.getLeft());
+                    }
+                }
+                // Caso 3: O nó a ser removido tem dois filhos
+                else {
+                    BSTNode<T> successorParent = currentNode;
+                    BSTNode<T> successor = currentNode.getRight();
+    
+                    // Encontre o sucessor (menor valor na subárvore da direita)
+                    while (successor.getLeft() != null) {
+                        successorParent = successor;
+                        successor = successor.getLeft();
+                    }
+    
+                    // Substitua o valor do nó atual pelo sucessor
+                    currentNode.setValue(successor.getValue());
+    
+                    // Remova o sucessor
+                    if (successorParent.getLeft() == successor) {
+                        successorParent.setLeft(successor.getRight());
+                    } else {
+                        successorParent.setRight(successor.getRight());
+                    }
+                }
+    
+                System.out.println("Remoção efetuada.");
+                return;
+            } else if (result < 0) {
+                parentNode = currentNode;
+                currentNode = currentNode.getLeft();
+            } else {
+                parentNode = currentNode;
+                currentNode = currentNode.getRight();
+            }
+        }
+    
+        System.out.println("Valor não encontrado.");
+    }
+
     public void removeRecursive(T value){
         if (this.isEmpty()==true) {
             System.out.println("Árvore está vazia");
@@ -75,17 +153,17 @@ public class BST<T extends Comparable<T>>{
                 }
                 else{
                     //node with two children
-                    BSTNode<T> parent, child;
-                    parent = root;
-                    child = root.getLeft();
-                    if (child.getRight() != null) {
-                        while (child.getRight() != null) {
-                            parent = child;
-                            child.getRight();
+                    BSTNode<T> parentNode, childNode;
+                    parentNode = root;
+                    childNode = root.getLeft();
+                    if (childNode.getRight() != null) {
+                        while (childNode.getRight() != null) {
+                            parentNode = childNode;
+                            childNode.getRight();
                         }
                     }
-                    root.setValue(child.getValue());
-                    parent.setRight(child.getLeft());
+                    root.setValue(childNode.getValue());
+                    parentNode.setRight(childNode.getLeft());
                     
                 }
             }
