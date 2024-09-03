@@ -5,7 +5,7 @@ import BinarySearchTree.BST;
 public class BSTApp {
 	public static void main(String[] args){
 		BST<Integer> tree = new BST<Integer>();
-		int num, choice;
+		Integer num, choice;
 		do {
 			Scanner scanner = new Scanner(System.in);
 			printMenu();
@@ -50,6 +50,12 @@ public class BSTApp {
 				case 11:
 					System.out.println("O número de nós não terminais é " + tree.numberOfNonTerminals());
 				break;
+				case 12:
+					System.out.println(tree.heightRecursive());
+				case 13:
+					System.out.print("Digite o valor a ser pesquisado:");
+					num = scanner.nextInt();
+					System.out.println(tree.frequency(num));
 				case 0:
 					scanner.close();
 					System.out.println("Tchau!");
@@ -63,6 +69,6 @@ public class BSTApp {
 	public static void printMenu(){
 		System.out.print("Opções:\n1 - Inserir valor\n2 - Remover valor\n3 - Confirmar presença de um valor\n4 - Exibir menor valor na árvore\n5 - Exibir maior valor na árvore\n6 - Exibir nós em ordem de nível\n" + //
 						"7 - Exibir nós em ordem crescente\n8 - Exibir nós verticalmente (pré-ordem)\n9 - Exibir número de nós\n10 - Exibir número de folhas\n" + //
-						"11 - Exibir número de nós não terminais\n0 - Encerrar programa\nInforme a opção: ");
+						"11 - Exibir número de nós não terminais\n 12 - Exibir altura da árvore\n 13 - Exibir a frequência de um valor\n0 - Encerrar programa\nInforme a opção: ");
 	}
 }
