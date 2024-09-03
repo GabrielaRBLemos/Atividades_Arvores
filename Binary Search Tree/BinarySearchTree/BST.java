@@ -70,7 +70,6 @@ public class BST<T extends Comparable<T>>{
             result = value.compareTo(currentNode.getValue());
     
             if (result == 0) {
-                // Caso 1: O nó a ser removido não tem filhos
                 if (currentNode.getLeft() == null && currentNode.getRight() == null) {
                     if (parentNode == null) {
                         this.root = null; // Nó raiz sendo removido
@@ -80,10 +79,9 @@ public class BST<T extends Comparable<T>>{
                         parentNode.setRight(null);
                     }
                 }
-                // Caso 2: O nó a ser removido tem apenas um filho
                 else if (currentNode.getLeft() == null) {
                     if (parentNode == null) {
-                        this.root = currentNode.getRight(); // Nó raiz sendo removido
+                        this.root = currentNode.getRight();
                     } else if (parentNode.getLeft() == currentNode) {
                         parentNode.setLeft(currentNode.getRight());
                     } else {
@@ -91,28 +89,24 @@ public class BST<T extends Comparable<T>>{
                     }
                 } else if (currentNode.getRight() == null) {
                     if (parentNode == null) {
-                        this.root = currentNode.getLeft(); // Nó raiz sendo removido
+                        this.root = currentNode.getLeft();
                     } else if (parentNode.getLeft() == currentNode) {
                         parentNode.setLeft(currentNode.getLeft());
                     } else {
                         parentNode.setRight(currentNode.getLeft());
                     }
                 }
-                // Caso 3: O nó a ser removido tem dois filhos
                 else {
                     BSTNode<T> successorParent = currentNode;
                     BSTNode<T> successor = currentNode.getRight();
     
-                    // Encontre o sucessor (menor valor na subárvore da direita)
                     while (successor.getLeft() != null) {
                         successorParent = successor;
                         successor = successor.getLeft();
                     }
     
-                    // Substitua o valor do nó atual pelo sucessor
                     currentNode.setValue(successor.getValue());
     
-                    // Remova o sucessor
                     if (successorParent.getLeft() == successor) {
                         successorParent.setLeft(successor.getRight());
                     } else {
@@ -504,6 +498,60 @@ public class BST<T extends Comparable<T>>{
                 }
             }
             return numOfLeafs;
+        }
+    }
+
+    public int heightRecursive(){
+        if(this.isEmpty()  == true){
+            return 0;
+        }
+        else if (this.root.getLeft() ==  null && this.root.getRight() ==  null) {
+            return 0;
+        }
+        else{
+            return nodeHeight(this.root);
+        }
+    }
+
+    private int nodeHeight(BSTNode<T> root){
+        if (root.getLeft()==null && root.getRight() == null) {
+            return 0;
+        }
+        else if (root.getLeft() == null) {
+            int rightHeight = nodeHeight(root.getRight());
+            return rightHeight + 1;
+        }
+        else if (root.getRight() == null) {
+            int leftHeight = nodeHeight(root.getLeft());
+            return leftHeight + 1;
+        }
+        else{
+            int leftHeight = nodeHeight(root.getLeft());
+            int rightHeight = nodeHeight(root.getRight());
+            
+            if(leftHeight>rightHeight){
+                return leftHeight + 1;
+            }
+            else {
+                return rightHeight + 1;
+            }
+        }
+    }
+
+    public int frequency(T Value){
+        if (isEmpty()) {
+            return 0;
+        }
+        else{
+            int frequencyNum = 0;
+            BSTNode<T> currentNode = search(Value);
+
+            while (currentNode.getValue()==Value) {
+                frequencyNum =+ 1;
+                currentNode = currentNode.getRight();
+            }
+            
+            return frequencyNum;
         }
     }
 }
