@@ -1,5 +1,8 @@
 package AVLTree;
 
+import Queue.Queue;
+import Stack.Stack;
+
 public class AVLT<T extends Comparable<T>>{
     private AVLTNode<T> root;
     private boolean status;
@@ -139,6 +142,55 @@ public class AVLT<T extends Comparable<T>>{
                 }
             }
             return r;
+    }
+
+    public void inOrder(){
+        if (isEmpty()) {
+            System.out.println("A árvore está vazia.");
+        }
+        else{
+            Stack<AVLTNode<T>> waitingStack = new Stack<AVLTNode<T>>();
+            AVLTNode<T> currentNode = this.root;
+
+            waitingStack.push(currentNode);
+            
+            while(currentNode != null && !waitingStack.isEmpty()){
+                while (currentNode != null) {
+                    waitingStack.push(currentNode);
+                    currentNode = currentNode.getLeft();
+                }
+                currentNode = waitingStack.pop();
+                System.out.print(currentNode.getValue()+" ");
+                currentNode = currentNode.getRight();
+            }
+            System.out.println();
+        }
+    }
+
+        public void byLevel(){
+        if (this.isEmpty()) {
+            System.out.println("A árvore está vazia.");
+        }
+        else{
+            AVLTNode<T> currentNode = this.root;
+            Queue<AVLTNode<T>> waitingQueue = new Queue<AVLTNode<T>>();
+
+            waitingQueue.enqueue(currentNode);
+            while (!waitingQueue.isEmpty()) {
+                currentNode = waitingQueue.dequeue();
+                if (currentNode != null) {
+                    System.out.print(currentNode.getValue()+" ");
+                    waitingQueue.enqueue(currentNode.getLeft());
+                    waitingQueue.enqueue(currentNode.getRight());
+                }
+                else{
+                    System.out.print("null ");
+                    waitingQueue.enqueue(null);
+                    waitingQueue.enqueue(null);
+                }
+            }
+            System.out.println();
+        }
     }
 
     // private AVLTNode<T> removeNode(AVLTNode<T> root,T value){
@@ -338,29 +390,6 @@ public class AVLT<T extends Comparable<T>>{
     //             if (currentNode.getRight() != null) {
     //                 waitingQueue.enqueue(currentNode.getRight());
     //             }
-    //         }
-    //         System.out.println();
-    //     }
-    // }
-
-    // public void inOrder(){
-    //     if (isEmpty()) {
-    //         System.out.println("A árvore está vazia.");
-    //     }
-    //     else{
-    //         Stack<AVLTNode<T>> waitingStack = new Stack<AVLTNode<T>>();
-    //         AVLTNode<T> currentNode = this.root;
-
-    //         waitingStack.push(currentNode);
-            
-    //         while(currentNode != null || !waitingStack.isEmpty()){
-    //             while (currentNode != null) {
-    //                 waitingStack.push(currentNode);
-    //                 currentNode = currentNode.getLeft();
-    //             }
-    //             currentNode = waitingStack.pop();
-    //             System.out.print(currentNode.AVLTNode()+" ");
-    //             currentNode = currentNode.getRight();
     //         }
     //         System.out.println();
     //     }
