@@ -17,17 +17,17 @@ public class BNode {
         return keys;
     }
 
-    // public void setKeys(int[] keys) {
-    //     this.keys = keys;
-    // }
+    public void setKeys(int[] keys) {
+        this.keys = keys;
+    }
 
     public BNode[] getChildren() {
         return children;
     }
 
-    // public void setChildren(BNode[] children) {
-    //     this.children = children;
-    // }
+    public void setChildren(BNode[] children) {
+        this.children = children;
+    }
 
     public int getNumKeys() {
         return numKeys;
@@ -98,7 +98,7 @@ public class BNode {
         for (int i = index; i < this.numKeys - 1; i++) {
             keys[i] = keys[i + 1];
         }
-        keys[this.numKeys - 1] = 0;
+        keys[this.numKeys - 1] = -1;
 
         this.numKeys--;
     }

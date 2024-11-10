@@ -51,6 +51,31 @@ public class BTree {
         insertNonFull(getRoot(), key);
     }
 
+        // Método para inserir uma chave em um nó não cheio
+        private void insertNonFull(BNode node, int key) {
+            int i = node.getNumKeys() - 1;
+            if (node.isLeaf()) {
+                while (i >= 0 && key < node.getKeyAt(i)) {
+                    i--;
+                }
+                node.setKeyAt(i + 1, key);
+                node.setNumKeys(node.getNumKeys() + 1);
+            } else {
+                while (i >= 0 && key < node.getKeyAt(i)) {
+                    i--;
+                }
+                i++;
+                BNode child = node.getChildAt(i);
+                if (child.getNumKeys() == order - 1) {
+                    splitChild(node, i);
+                    if (key > node.getKeyAt(i)) {
+                        i++;
+                    }
+                }
+                insertNonFull(node.getChildAt(i), key);
+            }
+        }
+
     // Função auxiliar para dividir um nó quando ele está cheio
     private void splitChild(BNode parent, int index) {
         BNode fullNode = parent.getChildAt(index);
@@ -83,31 +108,6 @@ public class BTree {
 
         parent.setChildAt(index + 1, newNode);
         parent.setNumKeys(parent.getNumKeys() + 1);
-    }
-
-    // Método para inserir uma chave em um nó não cheio
-    private void insertNonFull(BNode node, int key) {
-        int i = node.getNumKeys() - 1;
-        if (node.isLeaf()) {
-            while (i >= 0 && key < node.getKeyAt(i)) {
-                i--;
-            }
-            node.setKeyAt(i + 1, key);
-            node.setNumKeys(node.getNumKeys() + 1);
-        } else {
-            while (i >= 0 && key < node.getKeyAt(i)) {
-                i--;
-            }
-            i++;
-            BNode child = node.getChildAt(i);
-            if (child.getNumKeys() == order - 1) {
-                splitChild(node, i);
-                if (key > node.getKeyAt(i)) {
-                    i++;
-                }
-            }
-            insertNonFull(node.getChildAt(i), key);
-        }
     }
 //
 // --------Fim de métodos relacionados a inserção--------
@@ -362,7 +362,6 @@ public class BTree {
                 while (nodeCount > 0) {
                     BNode node = queue.poll();
 
-                    System.out.print("Keys: ");
                     for (int i = 0; i < node.getNumKeys(); i++) {
                         System.out.print(node.getKeyAt(i) + " ");
                     }

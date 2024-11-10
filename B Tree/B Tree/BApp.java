@@ -14,6 +14,7 @@ public class BApp {
 
             switch (option) {
                 case 1:
+                //TODO algum problema está faz getkey() retornar 0, pode ser problema com o insert
                     System.out.print("Informe o valor a ser inserido: ");
                     int value = sc.nextInt();
                     tree.insert(value);
@@ -43,6 +44,9 @@ public class BApp {
                     value = sc.nextInt();
                     tree.remove(value);
                     break;
+                case 0:
+                    sc.close();
+                    System.out.println("Tchau!");
                 default:
                     System.out.println("Opção inválida!");
             }
@@ -59,6 +63,7 @@ public class BApp {
         System.out.println("6 – Exibir as chaves por nível");
         System.out.println("7 – Exibir as chaves em ordem");
         System.out.println("8 – Remover um valor da árvore");
+        System.out.println("0 – Encerar programa");
         System.out.print("Informe a opção desejada: ");
     }
 }
