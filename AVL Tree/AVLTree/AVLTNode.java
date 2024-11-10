@@ -3,17 +3,20 @@ package AVLTree;
 class AVLTNode<T extends Comparable<T>>{
     private AVLTNode<T> left,right;
     private T Value;
-    private int balFactor;
+    private Integer balFactor;
 
     public AVLTNode(T value) {
+        this.left = null;
+        this.right = null;
         Value = value;
+        this.balFactor = 0;
     }
 
-    public int getbalFactor() {
+    public Integer getbalFactor() {
         return balFactor;
     }
 
-    public void setbalFactor(int balFactor) {
+    public void setbalFactor(Integer balFactor) {
         this.balFactor = balFactor;
     }
 

@@ -216,7 +216,7 @@ public class BST<T extends Comparable<T>>{
                 else if(currentNode.getValue().compareTo(searchValue)<0){
                     currentNode = currentNode.getRight();
                 }
-                else if(currentNode.getValue().compareTo(searchValue)<0){
+                else if(currentNode.getValue().compareTo(searchValue)==0){
                     return currentNode;
                 }
             }
@@ -330,8 +330,6 @@ public class BST<T extends Comparable<T>>{
         else{
             Stack<BSTNode<T>> waitingStack = new Stack<BSTNode<T>>();
             BSTNode<T> currentNode = this.root;
-
-            waitingStack.push(currentNode);
             
             while(currentNode != null || !waitingStack.isEmpty()){
                 while (currentNode != null) {
