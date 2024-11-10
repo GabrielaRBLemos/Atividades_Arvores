@@ -1,69 +1,135 @@
 package BTree;
 
-import java.util.ArrayList;
+public class BNode {
+    private int[] keys;
+    private BNode[] children;
+    private int numKeys;
+    private boolean isLeaf;
 
-class BNode <T extends Comparable<T>>{
-    private ArrayList<T> valueArray;
-    private ArrayList<BNode<T>> pointerArray;
-
-    BNode(int degree) {
-        valueArray = new ArrayList<T>(degree - 1);
-        pointerArray = new ArrayList<BNode<T>>(degree);
+    public BNode(int order, boolean isLeaf) {
+        keys = new int[order - 1];
+        children = new BNode[order];
+        this.isLeaf = isLeaf;
+        numKeys = 0;
     }
 
-    public ArrayList<T> getValueArray() {
-        return this.valueArray;
+    public int[] getKeys() {
+        return keys;
     }
 
-    public void setValueArray(ArrayList<T> valueArray) {
-        this.valueArray = valueArray;
+    // public void setKeys(int[] keys) {
+    //     this.keys = keys;
+    // }
+
+    public BNode[] getChildren() {
+        return children;
     }
 
-    public ArrayList<BNode<T>> getPointerArray() {
-        return pointerArray;
+    // public void setChildren(BNode[] children) {
+    //     this.children = children;
+    // }
+
+    public int getNumKeys() {
+        return numKeys;
     }
 
-    public void setPointerArray(ArrayList<BNode<T>> pointerArray) {
-        this.pointerArray = pointerArray;
+    public void setNumKeys(int numKeys) {
+        this.numKeys = numKeys;
     }
 
-    public T getValueAt(int index) {
-        if (isInvalidIndexValue(index)) {
-            throw new IndexOutOfBoundsException("Índice fora dos limites.");
+    public boolean isLeaf() {
+        return isLeaf;
+    }
+
+    public void setLeaf(boolean isLeaf) {
+        this.isLeaf = isLeaf;
+    }
+
+    public BNode getChildAt(int index) {
+        if (index >= 0 && index < children.length) {
+            return children[index];
         }
-        return this.valueArray.get(index);
+        return null;
     }
 
-    public void setValueAt(int index, T value) {
-        if (isInvalidIndexValue(index)) {
-            throw new IndexOutOfBoundsException("Índice fora dos limites.");
+    public void setChildAt(int index, BNode child) {
+        if (index >= 0 && index < children.length) {
+            children[index] = child;
         }
-        this.valueArray.set(index, value);
     }
 
-    public BNode<T> getPointerAt(int index) {
-        if (isInvalidIndexPointer(index)) {
-            throw new IndexOutOfBoundsException("Índice fora dos limites.");
+    public int getKeyAt(int index) {
+        if (index >= 0 && index < this.numKeys) {
+            return keys[index];
         }
-        return this.pointerArray.get(index);
+        return -1;
     }
 
-    public void setPointerAt(int index, BNode<T> value) {
-        if (isInvalidIndexPointer(index)) {
-            throw new IndexOutOfBoundsException("Índice fora dos limites.");
+    public void setKeyAt(int index, int value) {
+        if (index >= 0 && index < this.numKeys) {
+            keys[index] = value;
         }
-        this.pointerArray.set(index, value);
     }
 
-    public boolean isInvalidIndexValue(int index){
-        return index < 0 || index >= this.valueArray.size();
+    public int searchKey(int key) {
+        int i = 0;
+        while (i < this.numKeys && key > keys[i]) {
+            i++;
+        }
+        return (i < this.numKeys && keys[i] == key) ? i : -1;
     }
 
-    public boolean isInvalidIndexPointer(int index){
-        return index < 0 || index >= this.pointerArray.size();
+    public void addKey(int key) {
+        int i = numKeys - 1;
+
+        // chave para a direita para fazer espaço para a nova chave
+        while (i >= 0 && keys[i] > key) {
+            keys[i + 1] = keys[i];
+            i--;
+        }
+        keys[i + 1] = key;
+        numKeys++;
     }
 
-    public boolean isLeaf(){
-        return pointerArray.isEmpty();
+    public void removeKeyAt(int index) {
+        if (index < 0 || index >= this.numKeys) {
+            throw new IllegalArgumentException("Invalid index for key removal.");
+        }
+        for (int i = index; i < this.numKeys - 1; i++) {
+            keys[i] = keys[i + 1];
+        }
+        keys[this.numKeys - 1] = 0;
+
+        this.numKeys--;
+    }
+
+    public void addChild(BNode newChild) {
+        if (isLeaf) {
+            children[this.numKeys] = newChild;
+        } else {
+            int i = this.numKeys - 1;
+            // ponteiros para a direita para abrir espaço para o novo ponteiro
+            while (i >= 0 && keys[i] > newChild.keys[0]) {
+                children[i + 1] = children[i];
+                i--;
+            }
+
+            children[i + 1] = newChild;
+        }
+
+        numKeys++;
+    }
+
+    public void removeChildAt(int index) {
+        if (index < 0 || index >= numKeys) {
+            throw new IllegalArgumentException("Invalid index for pointer removal.");
+        }
+
+        // filhos para a esquerda para preencher o espaço criado pelo filho removido
+        for (int i = index; i < numKeys - 1; i++) {
+            children[i] = children[i + 1];
+        }
+        children[numKeys - 1] = null;
+        numKeys--;
     }
 }
