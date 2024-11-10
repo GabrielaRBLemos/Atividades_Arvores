@@ -5,6 +5,8 @@ class AVLTNode<T extends Comparable<T>>{
     private T Value;
     private Integer balFactor;
 
+    
+
     public AVLTNode(T value) {
         this.left = null;
         this.right = null;
