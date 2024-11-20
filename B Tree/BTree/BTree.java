@@ -106,12 +106,12 @@ public class BTree {
 
         // Antes do elemento
         for (int i = 0; i < indexToDelete; i++) {
-            result[i] = keys[i];
+            result[i] = node.getKeyAt(i);
         }
 
         // Depois do elemento
-        for (int i = indexToDelete + 1; i < keys.length; i++) {
-            result[i - 1] = keys[i];
+        for (int i = indexToDelete + 1; i < 2 * minDegree - 1; i++) {
+            result[i - 1] = node.getKeyAt(i);
         }
 
         return result;
