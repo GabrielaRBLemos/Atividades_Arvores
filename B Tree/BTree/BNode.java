@@ -120,4 +120,11 @@ public class BNode {
         if (!isLeaf)
             children[numKeys].printInOrder();
     }
+
+    public void printKeys(){
+        for (int i = 0; i < this.numKeys; i++) {
+            System.out.print(this.keys[i]);
+        }
+        System.out.println();
+    }
 }

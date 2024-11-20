@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class BApp {
 
     public static void main(String[] args) {
-        BTree bTree = new BTree(5);
+        BTree bTree = new BTree(3); // 2 * minDegree - 1 = Ordem da árvore
         int option,num;
 
         do {

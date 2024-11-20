@@ -78,7 +78,7 @@ public class BTree {
 
     public void printInOrder() {
         if (this.isEmpty()) {
-            System.out.println("Árvore Vazia")
+            System.out.println("Árvore Vazia");
         }
         else{
             root.printInOrder();
@@ -88,7 +88,24 @@ public class BTree {
 
     public void printLevelOrder() {
         if (this.isEmpty()) {
-            System.out.println("Árvore Vazia")
+            System.out.println("Árvore Vazia");
+        }
+        else{
+            Queue<BNode> queue = new Queue<BNode>();
+            BNode node;
+            BNode child;
+            queue.enqueue(this.root);
+
+            while (!queue.isEmpty()) {
+                node = queue.dequeue();
+                node.printKeys();
+                for (int i = 0; i <= node.getNumKeys(); i++) {
+                    child = node.getChildAt(i);
+                    if (child != null) {
+                        queue.enqueue(child);
+                    }
+                }
+            }
         }
     }
 
