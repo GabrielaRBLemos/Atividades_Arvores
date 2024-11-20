@@ -1,7 +1,7 @@
 package BTree;
 
 public class BNode {
-    private int[] keys; 
+    private int[] keys;
     private int minDegree;
     private BNode[] children;
     private int numKeys;
@@ -17,6 +17,14 @@ public class BNode {
 
     public boolean isLeaf(){
         return this.isLeaf;
+    }
+
+    public int[] getKeys() {
+        return keys;
+    }
+
+    public void setKeys(int[] keys) {
+        this.keys = keys;
     }
 
     public int getKeyAt(int index){
@@ -43,6 +51,14 @@ public class BNode {
         this.numKeys = numKeys;
     }
 
+    public int getMinDegree() {
+        return minDegree;
+    }
+
+    public void setMinDegree(int minDegree) {
+        this.minDegree = minDegree;
+    }
+
     public BNode search(int key) {
         int i = 0;
         while (i < numKeys && key > keys[i])
@@ -56,6 +72,15 @@ public class BNode {
 
         return children[i].search(key);
     }
+
+    public int searchKeyIndex(int targetKey) {
+        for (int i = 0; i < numKeys; i++) {
+            if (keys[i] == targetKey) {
+                return i;
+            }
+        }
+        return null;
+    }    
 
     public void insertNonFull(int key) {
         int i = numKeys - 1;

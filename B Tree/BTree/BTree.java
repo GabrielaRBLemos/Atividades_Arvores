@@ -32,8 +32,12 @@ public class BTree {
     }
 
     public BNode search(int key) {
-        return (this.isEmpty()) ? null : root.search(key);
-    }
+        if (this.isEmpty()) {
+            return null;
+        } else {
+            return root.search(key);
+        }
+    }    
 
     public void displayMax() {
         if(isEmpty()){
@@ -72,8 +76,141 @@ public class BTree {
     }
 
     public void remove(int key) {
-        //TODO: implement removal of key
-        System.out.println("Remover chave não implementado");
+        if (isEmpty()) {
+            System.out.println("Árvore Vazia");
+            return;
+        }
+        else{
+            BNode node = root.search(key);
+            if (node == null) {
+                System.out.println("Valor não encontrado na árvore.");
+                return;
+            }
+            if (node.isLeaf()) {
+                if (node.getNumKeys()-1 >= node.getMinDegree()) {
+                    node.setKeys(newKeys(node, key));
+                }
+                else{
+                    handleLeafUnderflow(node, key);
+                }
+            }
+            else{
+                //TODO: chave está em um nó interno
+            }
+        }
+    }
+
+    private int[] newKeys(BNode node, int keyToDelete) {
+        int indexToDelete = node.searchKeyIndex(keyToDelete);
+        int[] result = new int[2 * minDegree - 1];
+
+        // Antes do elemento
+        for (int i = 0; i < indexToDelete; i++) {
+            result[i] = keys[i];
+        }
+
+        // Depois do elemento
+        for (int i = indexToDelete + 1; i < keys.length; i++) {
+            result[i - 1] = keys[i];
+        }
+
+        return result;
+    }
+
+    private void handleLeafUnderflow(BNode node, int key) {
+        int indexToDelete = node.searchKeyIndex(key);
+
+        if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
+            borrowFromLeftSibling(node, indexToDelete);
+        } else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
+            borrowFromRightSibling(node, indexToDelete);
+        } else {
+            if (indexToDelete > 0) {
+                mergeWithLeftSibling(node, indexToDelete);
+            } else {
+                mergeWithRightSibling(node, indexToDelete);
+            }
+        }
+    }
+
+    private void borrowFromLeftSibling(BNode node, int indexToDelete) {
+        BNode leftSibling = node.getChildAt(indexToDelete - 1);
+        BNode currentNode = node.getChildAt(indexToDelete);
+    
+        // chave do pai para o nó atual
+        currentNode.setKeyAt(node.getKeyAt(indexToDelete - 1), 0);
+        currentNode.setNumKeys(currentNode.getNumKeys() + 1);
+    
+        // maior chave do irmão à esquerda para o pai
+        node.setKeyAt(leftSibling.getKeyAt(leftSibling.getNumKeys() - 1), indexToDelete - 1);
+
+        leftSibling.setNumKeys(leftSibling.getNumKeys() - 1);
+    }
+    
+    private void borrowFromRightSibling(BNode node, int indexToDelete) {
+        BNode rightSibling = node.getChildAt(indexToDelete + 1);
+        BNode currentNode = node.getChildAt(indexToDelete);
+    
+        // chave do pai para o nó atual
+        currentNode.setKeyAt(node.getKeyAt(indexToDelete), currentNode.getNumKeys());
+        currentNode.setNumKeys(currentNode.getNumKeys() + 1);
+    
+        // menor chave do irmão à direita para o pai
+        node.setKeyAt(rightSibling.getKeyAt(0), indexToDelete);
+
+        for (int i = 1; i < rightSibling.getNumKeys(); i++) {
+            rightSibling.setKeyAt(rightSibling.getKeyAt(i), i - 1);
+        }
+    
+        rightSibling.setNumKeys(rightSibling.getNumKeys() - 1);
+    }
+    
+    private void mergeWithLeftSibling(BNode node, int indexToDelete) {
+        BNode leftSibling = node.getChildAt(indexToDelete - 1);
+        BNode currentNode = node.getChildAt(indexToDelete);
+    
+        // chave do pai para o irmão à esquerda
+        leftSibling.setKeyAt(node.getKeyAt(indexToDelete - 1), leftSibling.getNumKeys());
+        leftSibling.setNumKeys(leftSibling.getNumKeys() + 1);
+    
+        // todas as chaves do nó atual para o irmão à esquerda
+        for (int i = 0; i < currentNode.getNumKeys(); i++) {
+            leftSibling.setKeyAt(currentNode.getKeyAt(i), leftSibling.getNumKeys());
+            leftSibling.setNumKeys(leftSibling.getNumKeys() + 1);
+        }
+    
+        // remover o nó
+        node.setChildAt(null, indexToDelete);
+    
+        for (int i = indexToDelete; i < node.getNumKeys(); i++) {
+            node.setChildAt(node.getChildAt(i + 1), i);
+        }
+    
+        node.setNumKeys(node.getNumKeys() - 1);
+    }
+    
+    private void mergeWithRightSibling(BNode node, int indexToDelete) {
+        BNode rightSibling = node.getChildAt(indexToDelete + 1);
+        BNode currentNode = node.getChildAt(indexToDelete);
+    
+        // chave do pai para o nó atual
+        currentNode.setKeyAt(node.getKeyAt(indexToDelete), currentNode.getNumKeys());
+        currentNode.setNumKeys(currentNode.getNumKeys() + 1);
+    
+        // todas as chaves do irmão à direita para o nó atual
+        for (int i = 0; i < rightSibling.getNumKeys(); i++) {
+            currentNode.setKeyAt(rightSibling.getKeyAt(i), currentNode.getNumKeys());
+            currentNode.setNumKeys(currentNode.getNumKeys() + 1);
+        }
+    
+        // remover nó
+        node.setChildAt(null, indexToDelete + 1);
+
+        for (int i = indexToDelete + 1; i < node.getNumKeys(); i++) {
+            node.setChildAt(node.getChildAt(i + 1), i);
+        }
+    
+        node.setNumKeys(node.getNumKeys() - 1);
     }
 
     public void printInOrder() {
