@@ -91,11 +91,11 @@ public class BTree {
                     node.setKeys(newKeys(node, key));
                 }
                 else{
-                    handleLeafUnderflow(node, key);
+                    handleChildUnderflow(node, key);
                 }
             }
             else{
-                //TODO: chave está em um nó interno
+                removeInternalNode(node, key);
             }
         }
     }
@@ -117,14 +117,18 @@ public class BTree {
         return result;
     }
 
-    private void handleLeafUnderflow(BNode node, int key) {
+    private void handleChildUnderflow(BNode node, int key) {
         int indexToDelete = node.searchKeyIndex(key);
 
         if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
             borrowFromLeftSibling(node, indexToDelete);
-        } else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
+        }
+
+        else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
             borrowFromRightSibling(node, indexToDelete);
-        } else {
+        }
+
+        else {
             if (indexToDelete > 0) {
                 mergeWithLeftSibling(node, indexToDelete);
             } else {
@@ -211,6 +215,63 @@ public class BTree {
         }
     
         node.setNumKeys(node.getNumKeys() - 1);
+    }
+
+    private void removeInternalNode(BNode node, int key) {
+        int indexToDelete = node.searchKeyIndex(key);
+
+        // chave está no nó atual, e filho com chave é folha
+        if (node.getChildAt(indexToDelete).isLeaf()) {
+
+            if (node.getChildAt(indexToDelete).getNumKeys() > minDegree - 1) {
+                node.setKeys(newKeys(node, key));
+            } else {
+                handleChildUnderflow(node, indexToDelete);
+            }
+        } else {
+            // chave está no nó atual, mas filho com chave é um nó interno
+
+            // predecessor
+            if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
+                int predecessorKey = getPredecessorKey(node, indexToDelete);
+                node.setKeyAt(predecessorKey, indexToDelete);
+                removeInternalNode(node.getChildAt(indexToDelete - 1), predecessorKey);
+            }
+
+            // successor
+            else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
+                int successorKey = getSuccessorKey(node, indexToDelete);
+                node.setKeyAt(successorKey, indexToDelete);
+                removeInternalNode(node.getChildAt(indexToDelete + 1), successorKey);
+            }
+
+            // unir com irmão
+            else {
+                if (indexToDelete > 0) {
+                    mergeWithLeftSibling(node, indexToDelete);
+                    removeInternalNode(node.getChildAt(indexToDelete - 1), key);
+                } else {
+                    mergeWithRightSibling(node, indexToDelete);
+                    removeInternalNode(node.getChildAt(indexToDelete), key);
+                }
+            }
+        }
+    }
+
+    private int getPredecessorKey(BNode node, int index) {
+        BNode childNode = node.getChildAt(index);
+        while (!childNode.isLeaf()) {
+            childNode = childNode.getChildAt(childNode.getNumKeys());
+        }
+        return childNode.getKeyAt(childNode.getNumKeys() - 1);
+    }
+
+    private int getSuccessorKey(BNode node, int index) {
+        BNode childNode = node.getChildAt(index + 1);
+        while (!childNode.isLeaf()) {
+            childNode = childNode.getChildAt(0);
+        }
+        return childNode.getKeyAt(0);
     }
 
     public void printInOrder() {
