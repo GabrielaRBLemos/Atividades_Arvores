@@ -1,11 +1,11 @@
 package BTree;
 
 public class BNode {
-    int[] keys; 
-    int minDegree;
-    BNode[] children;
-    int numKeys;
-    boolean isLeaf;
+    private int[] keys; 
+    private int minDegree;
+    private BNode[] children;
+    private int numKeys;
+    private boolean isLeaf;
 
     public BNode(int minDegree, boolean isLeaf) {
         this.minDegree = minDegree;
@@ -13,6 +13,34 @@ public class BNode {
         this.keys = new int[2 * minDegree - 1];
         this.children = new BNode[2 * minDegree];
         this.numKeys = 0;
+    }
+
+    public boolean isLeaf(){
+        return this.isLeaf;
+    }
+
+    public int getKeyAt(int index){
+        return this.keys[index];
+    }
+
+    public void setKeyAt(int key, int index){
+        this.keys[index] = key;
+    }
+
+    public BNode getChildAt(int index){
+        return this.children[index];
+    }
+
+    public void setChildAt(BNode child, int index){
+        this.children[index] = child;
+    }
+
+    public int getNumKeys(){
+        return this.numKeys;
+    }
+
+    public void setNumKeys(int numKeys){
+        this.numKeys = numKeys;
     }
 
     public BNode search(int key) {

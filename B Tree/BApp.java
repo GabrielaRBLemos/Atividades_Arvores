@@ -22,12 +22,12 @@ public class BApp {
                     break;
 
                 case 2:
-                    // Exibir a maior chave armazenada na árvore
+                    // Exibir a maior chave na árvore
                     bTree.displayMax();
                     break;
 
                 case 3:
-                    // Exibir a menor chave armazenada na árvore
+                    // Exibir a menor chave na árvore
                     bTree.displayMin();
                     break;
 
@@ -57,7 +57,7 @@ public class BApp {
                 case 7:
                     // Exibir as chaves em ordem
                     System.out.print("Chaves em ordem: ");
-                    bTree.printBTree();
+                    bTree.printInOrder();
                     break;
                 case 8:
                     // Remover um valor da árvore
@@ -80,8 +80,8 @@ public class BApp {
     public static void printMenu() {
         System.out.println("Opções:");
         System.out.println("1 – Inserir valor na árvore");
-        System.out.println("2 – Exibir a maior chave armazenada na árvore");
-        System.out.println("3 – Exibir a menor chave armazenada na árvore");
+        System.out.println("2 – Exibir a maior chave na árvore");
+        System.out.println("3 – Exibir a menor chave na árvore");
         System.out.println("4 – Exibir a altura da árvore");
         System.out.println("5 – Procurar um valor na árvore");
         System.out.println("6 – Exibir as chaves por nível");

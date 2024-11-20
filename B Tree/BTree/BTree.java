@@ -11,15 +11,19 @@ public class BTree {
         this.root = null;
     }
 
+    public boolean isEmpty(){
+        return root == null;
+    }
+
     public void insert(int key) {
-        if (root == null) {
+        if (this.isEmpty()) {
             root = new BNode(minDegree, true);
-            root.keys[0] = key;
-            root.numKeys = 1;
+            root.setKeyAt(key, 0);
+            root.setNumKeys(1);
         } else {
-            if (root.numKeys == 2 * minDegree - 1) {
+            if (root.getNumKeys() == 2 * minDegree - 1) {
                 BNode newRoot = new BNode(minDegree, false);
-                newRoot.children[0] = root;
+                newRoot.setChildAt(root, 0);
                 newRoot.splitChild(0, root);
                 root = newRoot;
             }
@@ -28,32 +32,32 @@ public class BTree {
     }
 
     public BNode search(int key) {
-        return (root == null) ? null : root.search(key);
-    }
-
-    public void printBTree() {
-        if (root != null)
-            root.printInOrder();
-        System.out.println();
+        return (this.isEmpty()) ? null : root.search(key);
     }
 
     public void displayMax() {
-        if (root != null) {
-            BNode node = root;
-            while (!node.isLeaf) {
-                node = node.children[node.numKeys];
-            }
-            System.out.println("Maior chave: " + node.keys[node.numKeys - 1]);
-        } else {
+        if(isEmpty()){
             System.out.println("Árvore vazia.");
+        }
+        else{
+            BNode node = root;
+            while (!node.isLeaf()) {
+                node = node.getChildAt(node.getNumKeys());
+            }
+            System.out.println("Maior chave: " + node.getKeyAt(node.getNumKeys() - 1));
         }
     }
 
     public void displayMin() {
-        if (root != null) {
-            System.out.println("Menor chave: " + root.keys[0]);
-        } else {
+        if(isEmpty()){
             System.out.println("Árvore vazia.");
+        }
+        else{
+            BNode node = root;
+            while (!node.isLeaf()) {
+                node = node.getChildAt(0);
+            }
+            System.out.println("Menor chave: " + node.getKeyAt(node.getNumKeys() - 1));
         }
     }
 
@@ -63,18 +67,29 @@ public class BTree {
 
     private int calculateHeight(BNode node) {
         if (node == null) return 0;
-        if (node.isLeaf) return 1;
-        return 1 + calculateHeight(node.children[0]);
+        if (node.isLeaf()) return 1;
+        return 1 + calculateHeight(node.getChildAt(0));
     }
 
     public void remove(int key) {
-        //TODO: remove node from tree
-        System.out.println("Remover não implementado.");
+        //TODO: implement removal of key
+        System.out.println("Remover chave não implementado");
+    }
+
+    public void printInOrder() {
+        if (this.isEmpty()) {
+            System.out.println("Árvore Vazia")
+        }
+        else{
+            root.printInOrder();
+            System.out.println();
+        }
     }
 
     public void printLevelOrder() {
-        //TODO: print level order
-        System.out.println("Passeio por nível não implementado");
+        if (this.isEmpty()) {
+            System.out.println("Árvore Vazia")
+        }
     }
 
 }
