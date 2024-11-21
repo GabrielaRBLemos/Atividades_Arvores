@@ -75,6 +75,8 @@ public class BTree {
         return 1 + calculateHeight(node.getChildAt(0));
     }
 
+    // TODO: REMOVAL NOT WORKING AS EXPECTED
+    
     public void remove(int key) {
         if (isEmpty()) {
             System.out.println("Árvore Vazia");
@@ -119,23 +121,31 @@ public class BTree {
 
     private void handleChildUnderflow(BNode node, int key) {
         int indexToDelete = node.searchKeyIndex(key);
-
-        if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
+    
+        // Ensure that the left child exists before trying to access it
+        if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1) != null &&
+            node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
             borrowFromLeftSibling(node, indexToDelete);
         }
-
-        else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
+        // Ensure that the right child exists before trying to access it
+        else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1) != null && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
             borrowFromRightSibling(node, indexToDelete);
         }
-
         else {
             if (indexToDelete > 0) {
-                mergeWithLeftSibling(node, indexToDelete);
+                // Ensure the left sibling exists before merging
+                if (node.getChildAt(indexToDelete - 1) != null) {
+                    mergeWithLeftSibling(node, indexToDelete);
+                }
             } else {
-                mergeWithRightSibling(node, indexToDelete);
+                // Ensure the right sibling exists before merging
+                if (node.getChildAt(indexToDelete + 1) != null) {
+                    mergeWithRightSibling(node, indexToDelete);
+                }
             }
         }
     }
+    
 
     private void borrowFromLeftSibling(BNode node, int indexToDelete) {
         BNode leftSibling = node.getChildAt(indexToDelete - 1);
@@ -304,6 +314,7 @@ public class BTree {
                     }
                 }
             }
+            System.out.println();
         }
     }
 

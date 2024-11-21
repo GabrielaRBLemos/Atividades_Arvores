@@ -79,7 +79,7 @@ public class BNode {
                 return i;
             }
         }
-        return null;
+        return -1;
     }    
 
     public void insertNonFull(int key) {
@@ -148,8 +148,7 @@ public class BNode {
 
     public void printKeys(){
         for (int i = 0; i < this.numKeys; i++) {
-            System.out.print(this.keys[i]);
+            System.out.print(this.keys[i] + " ");
         }
-        System.out.println();
     }
 }
