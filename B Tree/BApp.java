@@ -1,4 +1,3 @@
-import BTree.BNode;
 import BTree.BTree;
 import java.util.Scanner;
 
@@ -40,12 +39,7 @@ public class BApp {
                     // Procurar um valor na árvore
                     System.out.print("Informe o valor a ser procurado: ");
                     num = scanner.nextInt();
-                    BNode foundNode = bTree.search(num);
-                    if (foundNode != null) {
-                        System.out.println("Valor encontrado na árvore.");
-                    } else {
-                        System.out.println("Valor não encontrado na árvore.");
-                    }
+                    bTree.check(num);
                     break;
 
                 case 6:

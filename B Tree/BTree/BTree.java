@@ -31,13 +31,24 @@ public class BTree {
         }
     }
 
-    public BNode search(int key) {
+    public void check(int key) {
+        BNode node = this.search(key)[0];
+
+        if (node != null) {
+            System.out.println("Valor encontrado na árvore.");
+        } else {
+            System.out.println("Valor não encontrado na árvore.");
+        }
+    }
+
+    private BNode[] search(int key) {
         if (this.isEmpty()) {
             return null;
-        } else {
-            return root.search(key);
+        } 
+        else {
+            return root.search(key, null);  // raiz não tem pai
         }
-    }    
+    }
 
     public void displayMax() {
         if(isEmpty()){
@@ -75,214 +86,92 @@ public class BTree {
         return 1 + calculateHeight(node.getChildAt(0));
     }
 
-    // TODO: REMOVAL NOT WORKING AS EXPECTED
-    
-    public void remove(int key) {
-        if (isEmpty()) {
-            System.out.println("Árvore Vazia");
-            return;
+    // -------------- REMOVE QUARANTINE --------------
+    public void remove(int key){
+        BNode node,parent;
+        node = this.search(key)[0];
+        parent = this.search(key)[1];
+        if (node == null || this.isEmpty()) {
+            System.out.println("Valor não está presente na árvore.");
         }
-        else{
-            BNode node = root.search(key);
-            if (node == null) {
-                System.out.println("Valor não encontrado na árvore.");
-                return;
-            }
-            if (node.isLeaf()) {
-                if (node.getNumKeys()-1 >= node.getMinDegree()) {
-                    node.setKeys(newKeys(node, key));
-                }
-                else{
-                    handleChildUnderflow(node, key);
-                }
+        else if (node.isLeaf()) {
+            if (node.getNumKeys() > node.getMinDegree() - 1) {
+                node.deleteKey(key);
             }
             else{
-                removeInternalNode(node, key);
-            }
-        }
-    }
-
-    private int[] newKeys(BNode node, int keyToDelete) {
-        int indexToDelete = node.searchKeyIndex(keyToDelete);
-        int[] result = new int[2 * minDegree - 1];
-
-        // Antes do elemento
-        for (int i = 0; i < indexToDelete; i++) {
-            result[i] = node.getKeyAt(i);
-        }
-
-        // Depois do elemento
-        for (int i = indexToDelete + 1; i < 2 * minDegree - 1; i++) {
-            result[i - 1] = node.getKeyAt(i);
-        }
-
-        return result;
-    }
-
-    private void handleChildUnderflow(BNode node, int key) {
-        int indexToDelete = node.searchKeyIndex(key);
-    
-        // Ensure that the left child exists before trying to access it
-        if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1) != null &&
-            node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
-            borrowFromLeftSibling(node, indexToDelete);
-        }
-        // Ensure that the right child exists before trying to access it
-        else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1) != null && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
-            borrowFromRightSibling(node, indexToDelete);
-        }
-        else {
-            if (indexToDelete > 0) {
-                // Ensure the left sibling exists before merging
-                if (node.getChildAt(indexToDelete - 1) != null) {
-                    mergeWithLeftSibling(node, indexToDelete);
+                int nodeIndex = parent.searchChildIndex(node),siblingKey, parentKey;
+                int[] newNodeKeys = new int[ 2 * minDegree - 1], newParentKeys = new int[ 2 * minDegree - 1];
+                BNode leftNode = parent.getChildAt(nodeIndex-1), rightNode = parent.getChildAt(nodeIndex+1);
+                if (leftNode!=null && leftNode.getNumKeys() > leftNode.getMinDegree() - 1) {
+                    siblingKey = leftNode.getKeyAt(leftNode.getNumKeys()-1);
+                    parentKey = parent.getKeyAt(0);
+                    newNodeKeys[0] = parentKey;
+                    for (int i = 1; i < node.getKeys().length ; i++) {
+                        newNodeKeys[i] = node.getKeyAt(i-1);
+                    }
+                    newParentKeys[0] = siblingKey;
+                    for (int i = 1; i < node.getKeys().length ; i++) {
+                        newParentKeys[i] = parent.getKeyAt(i-1);
+                    }
                 }
-            } else {
-                // Ensure the right sibling exists before merging
-                if (node.getChildAt(indexToDelete + 1) != null) {
-                    mergeWithRightSibling(node, indexToDelete);
+                else if (rightNode != null && rightNode.getNumKeys() > rightNode.getMinDegree() - 1) {
+                    siblingKey = rightNode.getKeyAt(0);
+                    parentKey = parent.getKeyAt(nodeIndex);
+                    
+                    newNodeKeys[node.getNumKeys()-1] = parentKey;
+                    for (int i = 0; i < node.getKeys().length - 1; i++) {
+                        newNodeKeys[i+1] = node.getKeyAt(i);
+                    }
+
+                    newParentKeys[0] = siblingKey;
+                    for (int i = 1; i < node.getKeys().length ; i++) {
+                        newParentKeys[i] = parent.getKeyAt(i-1);
+                    }
+                }
+                else {
+                    if (leftNode != null) {
+                        mergeNodes(leftNode, node, parent, nodeIndex - 1);
+                    } else {
+                        mergeNodes(node, rightNode, parent, nodeIndex);
+                    }
                 }
             }
         }
-    }
-    
-
-    private void borrowFromLeftSibling(BNode node, int indexToDelete) {
-        BNode leftSibling = node.getChildAt(indexToDelete - 1);
-        BNode currentNode = node.getChildAt(indexToDelete);
-    
-        // chave do pai para o nó atual
-        currentNode.setKeyAt(node.getKeyAt(indexToDelete - 1), 0);
-        currentNode.setNumKeys(currentNode.getNumKeys() + 1);
-    
-        // maior chave do irmão à esquerda para o pai
-        node.setKeyAt(leftSibling.getKeyAt(leftSibling.getNumKeys() - 1), indexToDelete - 1);
-
-        leftSibling.setNumKeys(leftSibling.getNumKeys() - 1);
-    }
-    
-    private void borrowFromRightSibling(BNode node, int indexToDelete) {
-        BNode rightSibling = node.getChildAt(indexToDelete + 1);
-        BNode currentNode = node.getChildAt(indexToDelete);
-    
-        // chave do pai para o nó atual
-        currentNode.setKeyAt(node.getKeyAt(indexToDelete), currentNode.getNumKeys());
-        currentNode.setNumKeys(currentNode.getNumKeys() + 1);
-    
-        // menor chave do irmão à direita para o pai
-        node.setKeyAt(rightSibling.getKeyAt(0), indexToDelete);
-
-        for (int i = 1; i < rightSibling.getNumKeys(); i++) {
-            rightSibling.setKeyAt(rightSibling.getKeyAt(i), i - 1);
+        else{
+            //TODO: Remove internal nodes
+            System.out.println("Não Implementado - Nó interno");
         }
-    
-        rightSibling.setNumKeys(rightSibling.getNumKeys() - 1);
-    }
-    
-    private void mergeWithLeftSibling(BNode node, int indexToDelete) {
-        BNode leftSibling = node.getChildAt(indexToDelete - 1);
-        BNode currentNode = node.getChildAt(indexToDelete);
-    
-        // chave do pai para o irmão à esquerda
-        leftSibling.setKeyAt(node.getKeyAt(indexToDelete - 1), leftSibling.getNumKeys());
-        leftSibling.setNumKeys(leftSibling.getNumKeys() + 1);
-    
-        // todas as chaves do nó atual para o irmão à esquerda
-        for (int i = 0; i < currentNode.getNumKeys(); i++) {
-            leftSibling.setKeyAt(currentNode.getKeyAt(i), leftSibling.getNumKeys());
-            leftSibling.setNumKeys(leftSibling.getNumKeys() + 1);
-        }
-    
-        // remover o nó
-        node.setChildAt(null, indexToDelete);
-    
-        for (int i = indexToDelete; i < node.getNumKeys(); i++) {
-            node.setChildAt(node.getChildAt(i + 1), i);
-        }
-    
-        node.setNumKeys(node.getNumKeys() - 1);
-    }
-    
-    private void mergeWithRightSibling(BNode node, int indexToDelete) {
-        BNode rightSibling = node.getChildAt(indexToDelete + 1);
-        BNode currentNode = node.getChildAt(indexToDelete);
-    
-        // chave do pai para o nó atual
-        currentNode.setKeyAt(node.getKeyAt(indexToDelete), currentNode.getNumKeys());
-        currentNode.setNumKeys(currentNode.getNumKeys() + 1);
-    
-        // todas as chaves do irmão à direita para o nó atual
-        for (int i = 0; i < rightSibling.getNumKeys(); i++) {
-            currentNode.setKeyAt(rightSibling.getKeyAt(i), currentNode.getNumKeys());
-            currentNode.setNumKeys(currentNode.getNumKeys() + 1);
-        }
-    
-        // remover nó
-        node.setChildAt(null, indexToDelete + 1);
-
-        for (int i = indexToDelete + 1; i < node.getNumKeys(); i++) {
-            node.setChildAt(node.getChildAt(i + 1), i);
-        }
-    
-        node.setNumKeys(node.getNumKeys() - 1);
+        System.out.println(key + " Deletado");
     }
 
-    private void removeInternalNode(BNode node, int key) {
-        int indexToDelete = node.searchKeyIndex(key);
-
-        // chave está no nó atual, e filho com chave é folha
-        if (node.getChildAt(indexToDelete).isLeaf()) {
-
-            if (node.getChildAt(indexToDelete).getNumKeys() > minDegree - 1) {
-                node.setKeys(newKeys(node, key));
-            } else {
-                handleChildUnderflow(node, indexToDelete);
-            }
-        } else {
-            // chave está no nó atual, mas filho com chave é um nó interno
-
-            // predecessor
-            if (indexToDelete > 0 && node.getChildAt(indexToDelete - 1).getNumKeys() > minDegree - 1) {
-                int predecessorKey = getPredecessorKey(node, indexToDelete);
-                node.setKeyAt(predecessorKey, indexToDelete);
-                removeInternalNode(node.getChildAt(indexToDelete - 1), predecessorKey);
-            }
-
-            // successor
-            else if (indexToDelete < node.getNumKeys() - 1 && node.getChildAt(indexToDelete + 1).getNumKeys() > minDegree - 1) {
-                int successorKey = getSuccessorKey(node, indexToDelete);
-                node.setKeyAt(successorKey, indexToDelete);
-                removeInternalNode(node.getChildAt(indexToDelete + 1), successorKey);
-            }
-
-            // unir com irmão
-            else {
-                if (indexToDelete > 0) {
-                    mergeWithLeftSibling(node, indexToDelete);
-                    removeInternalNode(node.getChildAt(indexToDelete - 1), key);
-                } else {
-                    mergeWithRightSibling(node, indexToDelete);
-                    removeInternalNode(node.getChildAt(indexToDelete), key);
-                }
+    private void mergeNodes(BNode leftNode, BNode rightNode, BNode parent, int parentIndex) {
+        // o parent key node esquerdo
+        leftNode.setKeyAt(parent.getKeyAt(parentIndex), leftNode.getNumKeys());
+        leftNode.setNumKeys(leftNode.getNumKeys() + 1);
+    
+        // todas chaves e filhos para nó da esquerda
+        for (int i = 0; i < rightNode.getNumKeys(); i++) {
+            leftNode.setKeyAt(rightNode.getKeyAt(i), leftNode.getNumKeys());
+            leftNode.setNumKeys(leftNode.getNumKeys() + 1);
+        }
+    
+        if (!rightNode.isLeaf()) {
+            for (int i = 0; i <= rightNode.getNumKeys(); i++) {
+                leftNode.setChildAt(rightNode.getChildAt(i), leftNode.getNumKeys());
             }
         }
+    
+        // Remova a chave do pai e a referência do filho à direita
+        for (int i = parentIndex; i < parent.getNumKeys() - 1; i++) {
+            parent.setKeyAt(parent.getKeyAt(i + 1), i);
+            parent.setChildAt(parent.getChildAt(i + 2), i + 1);
+        }
+        parent.setNumKeys(parent.getNumKeys() - 1);
+
+        rightNode.setNumKeys(0);
     }
 
-    private int getPredecessorKey(BNode node, int index) {
-        BNode childNode = node.getChildAt(index);
-        while (!childNode.isLeaf()) {
-            childNode = childNode.getChildAt(childNode.getNumKeys());
-        }
-        return childNode.getKeyAt(childNode.getNumKeys() - 1);
-    }
-
-    private int getSuccessorKey(BNode node, int index) {
-        BNode childNode = node.getChildAt(index + 1);
-        while (!childNode.isLeaf()) {
-            childNode = childNode.getChildAt(0);
-        }
-        return childNode.getKeyAt(0);
-    }
+    // ---------- END  OF REMOVE QUARANTINE ----------
 
     public void printInOrder() {
         if (this.isEmpty()) {

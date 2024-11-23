@@ -59,18 +59,17 @@ public class BNode {
         this.minDegree = minDegree;
     }
 
-    public BNode search(int key) {
+    public BNode[] search(int key, BNode parent) {
         int i = 0;
         while (i < numKeys && key > keys[i])
             i++;
-
-        if (keys[i] == key)
-            return this;
-
-        if (isLeaf)
+        if (i < numKeys && keys[i] == key) {
+            return new BNode[] { this, parent };
+        }
+        if (isLeaf) {
             return null;
-
-        return children[i].search(key);
+        }
+        return children[i].search(key, this);
     }
 
     public int searchKeyIndex(int targetKey) {
@@ -80,7 +79,16 @@ public class BNode {
             }
         }
         return -1;
-    }    
+    }
+
+    public int searchChildIndex(BNode targetChild) {
+        for (int i = 0; i < numKeys+1; i++) {
+            if (children[i] == targetChild) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     public void insertNonFull(int key) {
         int i = numKeys - 1;
@@ -151,4 +159,23 @@ public class BNode {
             System.out.print(this.keys[i] + " ");
         }
     }
+
+    public void deleteKey(int value){
+        int index = this.searchKeyIndex(value);
+        int[] newKeys = new int[2 * minDegree - 1];
+
+        // Antes do elemento
+        for (int i = 0; i < index; i++) {
+            newKeys[i] = this.keys[i];
+        }
+
+        // Depois do elemento
+        for (int i = index+1; i < keys.length; i++) {
+            newKeys[i - 1] = this.keys[i];
+        }
+
+        this.numKeys -= 1;
+        this.keys = newKeys;
+    }
+
 }
