@@ -178,4 +178,20 @@ public class BNode {
         this.keys = newKeys;
     }
 
+    public int findMax() {
+        BNode currentNode = this;
+        while (!currentNode.isLeaf) {
+            currentNode = currentNode.getChildAt(currentNode.numKeys);
+        }
+        return currentNode.getKeyAt(currentNode.numKeys - 1);
+    }
+
+    public int findMin() {
+        BNode currentNode = this;
+        while (!currentNode.isLeaf) {
+            currentNode = currentNode.getChildAt(0);
+        }
+        return currentNode.getKeyAt(0);
+    }
+
 }

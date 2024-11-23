@@ -138,7 +138,8 @@ public class BTree {
             }
         }
         else{
-            //TODO: Remove internal nodes
+            removeInternalNodeKey(node, parent, key);
+
             System.out.println("Não Implementado - Nó interno");
         }
         System.out.println(key + " Deletado");
@@ -170,6 +171,36 @@ public class BTree {
 
         rightNode.setNumKeys(0);
     }
+
+    private void removeInternalNodeKey(BNode node, BNode parent, int key) {
+        int keyIndex = node.searchKeyIndex(key);
+        
+        if (keyIndex != -1) {
+            BNode leftChild = node.getChildAt(keyIndex);
+            BNode rightChild = node.getChildAt(keyIndex + 1);
+            
+            // se o filho esquerdo tem chaves suficientes (predecessor)
+            if (leftChild.getNumKeys() >= node.getMinDegree()) {
+                // substituir pelo predecessor
+                int predecessor = leftChild.findMax();
+                node.setKeyAt(predecessor, keyIndex);
+                leftChild.deleteKey(predecessor);
+            }
+            // se o filho direito tem chaves suficientes (sucessor)
+            else if (rightChild.getNumKeys() >= node.getMinDegree()) {
+                // substituir pelo sucessor
+                int successor = rightChild.findMin();
+                node.setKeyAt(successor, keyIndex);
+                rightChild.deleteKey(successor);
+            }
+            // juntar filhos
+            else {
+                mergeNodes(leftChild, rightChild, node, keyIndex);
+                node.deleteKey(key);
+            }
+        }
+    }
+    
 
     // ---------- END  OF REMOVE QUARANTINE ----------
 
